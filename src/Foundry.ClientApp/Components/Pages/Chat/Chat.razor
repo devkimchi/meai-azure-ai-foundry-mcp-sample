@@ -1,0 +1,104 @@
+﻿@page "/"
+
+@inject IConfiguration Config
+@inject IChatClient ChatClient
+@inject ILogger<Chat> Logger
+
+@implements IDisposable
+
+<PageTitle>Azure AI Foundry ChatClient</PageTitle>
+
+<ChatHeader OnNewChat="@ResetConversationAsync" />
+
+<ChatMessageList Messages="@messages" InProgressMessage="@currentResponseMessage">
+    <NoMessagesContent>
+        <div>To get started, try asking a question or providing a prompt.</div>
+    </NoMessagesContent>
+</ChatMessageList>
+
+<div class="chat-container">
+    <ChatSuggestions OnSelected="@AddUserMessageAsync" @ref="@chatSuggestions" />
+    <ChatInput OnSend="@AddUserMessageAsync" @ref="@chatInput" />
+</div>
+
+@code {
+    private const string SystemPrompt = @"
+        You are a friendly AI assistant.
+        If the question is not clear, ask for clarification.
+        If the question is inappropriate, respond like 'Sorry, the question is inappropriate.'.
+        Use only simple markdown to format your responses.
+        ";
+
+    private readonly ChatOptions chatOptions = new();
+    private readonly List<ChatMessage> messages = new();
+    private CancellationTokenSource? currentResponseCancellation;
+    private ChatMessage? currentResponseMessage;
+    private ChatInput? chatInput;
+    private ChatSuggestions? chatSuggestions;
+
+    protected override async Task OnInitializedAsync()
+    {
+        chatOptions.ModelId = Config["MEAI:ChatClient"]! switch
+        {
+            "foundry" => Config["AzureAIFoundry:DeploymentName"]!,
+            "local" => Config["FoundryLocal:ModelAlias"]!,
+            _ => throw new InvalidOperationException("Unsupported chat model specified in configuration.")
+        };
+
+        messages.Add(new(ChatRole.System, SystemPrompt));
+
+        await Task.CompletedTask;
+    }
+
+    private async Task AddUserMessageAsync(ChatMessage userMessage)
+    {
+        CancelAnyCurrentResponse();
+
+        // Add the user message to the conversation
+        messages.Add(userMessage);
+        chatSuggestions?.Clear();
+        await chatInput!.FocusAsync();
+
+        Logger.LogInformation("Using chat model: {modelId}", chatOptions.ModelId);
+
+        // Stream and display a new response from the IChatClient
+        var responseText = new TextContent("");
+        currentResponseMessage = new ChatMessage(ChatRole.Assistant, [responseText]);
+        currentResponseCancellation = new();
+        await foreach (var update in ChatClient.GetStreamingResponseAsync([.. messages], chatOptions, currentResponseCancellation.Token))
+        {
+            messages.AddMessages(update, filter: c => c is not TextContent);
+            responseText.Text += update.Text;
+            ChatMessageItem.NotifyChanged(currentResponseMessage);
+        }
+
+        // Store the final response in the conversation, and begin getting suggestions
+        messages.Add(currentResponseMessage!);
+        currentResponseMessage = null;
+        chatSuggestions?.Update(messages);
+    }
+
+    private void CancelAnyCurrentResponse()
+    {
+        // If a response was cancelled while streaming, include it in the conversation so it's not lost
+        if (currentResponseMessage is not null)
+        {
+            messages.Add(currentResponseMessage);
+        }
+
+        currentResponseCancellation?.Cancel();
+        currentResponseMessage = null;
+    }
+
+    private async Task ResetConversationAsync()
+    {
+        CancelAnyCurrentResponse();
+        messages.Clear();
+        messages.Add(new(ChatRole.System, SystemPrompt));
+        chatSuggestions?.Clear();
+        await chatInput!.FocusAsync();
+    }
+
+    public void Dispose()
+        => currentResponseCancellation?.Cancel();
+}

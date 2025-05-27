@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <AssemblyName>Meai.ClientApp</AssemblyName>
+    <RootNamespace>Meai.ClientApp</RootNamespace>
+
+    <UserSecretsId>a109024b-3cc3-4ed6-bccb-a51c1d30ab17</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Anthropic.SDK" Version="5.*" />
+    <PackageReference Include="Azure.AI.OpenAI" Version="2.*-*" />
+    <PackageReference Include="Microsoft.Extensions.AI" Version="9.*-*" />
+    <PackageReference Include="Microsoft.Extensions.AI.OpenAI" Version="9.*-*" />
+    <PackageReference Include="Mscc.GenerativeAI.Microsoft" Version="2.*" />
+    <PackageReference Include="System.Linq.Async" Version="6.*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MeaiFoundryMcp.ServiceDefaults\MeaiFoundryMcp.ServiceDefaults.csproj" />
+  </ItemGroup>
+
+</Project>
