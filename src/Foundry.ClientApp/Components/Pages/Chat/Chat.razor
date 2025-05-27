@@ -1,6 +1,8 @@
 ﻿@page "/"
 
+@inject IConfiguration Config
 @inject IChatClient ChatClient
+@inject ILogger<Chat> Logger
 
 @implements IDisposable
 
@@ -36,6 +38,13 @@
 
     protected override async Task OnInitializedAsync()
     {
+        chatOptions.ModelId = Config["MEAI:ChatClient"]! switch
+        {
+            "foundry" => Config["AzureAIFoundry:DeploymentName"]!,
+            "local" => Config["FoundryLocal:ModelAlias"]!,
+            _ => throw new InvalidOperationException("Unsupported chat model specified in configuration.")
+        };
+
         messages.Add(new(ChatRole.System, SystemPrompt));
 
         await Task.CompletedTask;
@@ -49,6 +58,8 @@
         messages.Add(userMessage);
         chatSuggestions?.Clear();
         await chatInput!.FocusAsync();
+
+        Logger.LogInformation("Using chat model: {modelId}", chatOptions.ModelId);
 
         // Stream and display a new response from the IChatClient
         var responseText = new TextContent("");

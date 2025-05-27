@@ -9,22 +9,18 @@ using Microsoft.Extensions.AI;
 var builder = WebApplication.CreateBuilder(args);
 
 var config = builder.Configuration;
-var connectionstring = config.GetConnectionString("foundry") ?? throw new InvalidOperationException("Missing connection string: foundry.");
-var endpoint = connectionstring.Split(';').FirstOrDefault(x => x.StartsWith("Endpoint=", StringComparison.InvariantCultureIgnoreCase))?.Split('=')[1]
-                   ?? throw new InvalidOperationException("Missing endpoint.");
-var apiKey = connectionstring.Split(';').FirstOrDefault(x => x.StartsWith("Key=", StringComparison.InvariantCultureIgnoreCase))?.Split('=')[1]
-                 ?? throw new InvalidOperationException("Missing API key.");
 
 builder.AddServiceDefaults();
 
 builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
 
-var credential = new AzureKeyCredential(apiKey);
-var options = new AzureAIInferenceClientOptions()
-                  .AddApiVersionPolicy(config["AzureAIFoundry:ApiVersion"]!);
-var foundryClient = new ChatCompletionsClient(new Uri(endpoint), credential, options);
-var chatClient = foundryClient.AsIChatClient(config["AzureAIFoundry:DeploymentName"]!);
+var chatClient = config["MEAI:ChatClient"]! switch
+{
+    "foundry" => builder.GetAIFoundryChatClient(),
+    "local" => await builder.GetFoundryLocalChatClient(),
+    _ => throw new InvalidOperationException("Unknown chat client.")
+};
 
 builder.Services.AddChatClient(chatClient)
                 .UseLogging();
