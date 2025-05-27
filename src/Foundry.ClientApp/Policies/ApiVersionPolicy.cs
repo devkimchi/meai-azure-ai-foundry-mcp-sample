@@ -3,6 +3,7 @@ using Azure.Core.Pipeline;
 
 namespace Foundry.ClientApp.Policies;
 
+// https://github.com/Azure/azure-sdk-for-net/issues/48405#issuecomment-2704360548
 public class ApiVersionPolicy(string apiVersion) : HttpPipelinePolicy
 {
     public override void Process(HttpMessage message, ReadOnlyMemory<HttpPipelinePolicy> pipeline)
