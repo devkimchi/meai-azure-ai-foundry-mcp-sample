@@ -12,11 +12,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Azure.AI.OpenAI" Version="2.*-*" />
-    <PackageReference Include="Azure.Projects.AI" Version="1.*-*" />
+    <PackageReference Include="Azure.AI.Inference" Version="1.*-*" />
+    <PackageReference Include="Azure.Core" Version="1.*" />
     <PackageReference Include="Microsoft.Extensions.AI" Version="9.*-*" />
-    <PackageReference Include="Microsoft.Extensions.AI.OpenAI" Version="9.*-*" />
-    <PackageReference Include="ModelContextProtocol" Version="0.*-*" />
+    <PackageReference Include="Microsoft.Extensions.AI.AzureAIInference" Version="9.*-*" />
     <PackageReference Include="System.Linq.Async" Version="6.*" />
   </ItemGroup>
 
