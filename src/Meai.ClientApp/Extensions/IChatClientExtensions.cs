@@ -30,7 +30,9 @@ public static class IChatClientExtensions
             Endpoint = new Uri(endpoint),
         };
 
-        var openAIClient = endpoint.TrimEnd('/').Equals("https://models.inference.ai.azure.com")
+        var openAIClient = (endpoint.TrimEnd('/').Equals("https://models.inference.ai.azure.com") ||
+                            endpoint.TrimEnd('/').Equals("https://models.github.ai/inference") ||
+                            endpoint.TrimEnd('/').StartsWith("https://api.openai.com"))
                         ? new OpenAIClient(credential, openAIOptions)
                         : new AzureOpenAIClient(new Uri(endpoint), credential);
         var chatClient = openAIClient.GetChatClient(config["OpenAI:DeploymentName"]!).AsIChatClient();

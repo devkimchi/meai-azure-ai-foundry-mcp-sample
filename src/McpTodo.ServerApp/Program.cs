@@ -1,5 +1,4 @@
 using McpTodoList.ContainerApp.Data;
-using McpTodoList.ContainerApp.Middlewares;
 using McpTodoList.ContainerApp.Repositories;
 
 using Microsoft.Data.Sqlite;
@@ -33,9 +32,6 @@ using (var scope = app.Services.CreateScope())
 
 // Configure the HTTP request pipeline.
 app.UseHttpsRedirection();
-
-// Enable API key auth for MCP server.
-app.UseMcpAuth();
 
 // Configure the MCP endpoints.
 app.MapMcp();
