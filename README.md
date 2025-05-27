@@ -10,7 +10,7 @@ Did you know .NET is the most versatile language to build both frontend and back
 - [Azure Subscription](http://azure.microsoft.com/free)
 - [Foundry Local](https://learn.microsoft.com/azure/ai-foundry/foundry-local/get-started)
 
-## Getting Started
+## Getting started
 
 ### Build Foundry Local SDK
 
@@ -69,7 +69,7 @@ Did you know .NET is the most versatile language to build both frontend and back
 
    > **NOTE**: This step is only required until the official NuGet package is published.
 
-### `Microsoft.Extensions.AI` sample app
+### Run `Microsoft.Extensions.AI` sample app
 
 1. Make sure you have API keys for OpenAI, Azure OpenAI, GitHub Models, Anthropic and/or Google Vertex AI.
 1. Store those API keys to user secrets:
@@ -126,7 +126,7 @@ Did you know .NET is the most versatile language to build both frontend and back
     dotnet watch run --project ./src/Meai.ClientApp
     ```
 
-### Azure AI Foundry sample app
+### Run Azure AI Foundry sample app
 
 1. Make sure you have an API key for Azure AI Foundry.
 1. Store the API key to user secrets:
@@ -152,7 +152,7 @@ Did you know .NET is the most versatile language to build both frontend and back
     dotnet watch run --project ./src/Foundry.ClientApp
     ```
 
-### Foundry Local sample app
+### Run Foundry Local sample app
 
 1. Make sure you have installed Foundry Local CLI.
 1. Add model to Foundry Local. You can add any model from the list by running `foundry model ls`.
@@ -177,7 +177,7 @@ Did you know .NET is the most versatile language to build both frontend and back
     dotnet watch run --project ./src/Foundry.ClientApp
     ```
 
-### MCP server/client sample app
+### Run MCP server/client sample app
 
 1. Make sure you have API keys for OpenAI, Azure OpenAI or GitHub Models.
 1. Store those API keys to user secrets:
@@ -205,7 +205,7 @@ Did you know .NET is the most versatile language to build both frontend and back
     dotnet watch run --project ./src/mcpTodo.ClientApp
     ```
 
-## Known Issues: Foundry Local CLI installation
+## Known Issues: Installing Foundry Local CLI
 
 On Windows, if you keep failing to install Foundry Local CLI on your machine, try this way as a [workaround](https://github.com/microsoft/Foundry-Local/issues/79#issuecomment-2899281617):
 
@@ -219,3 +219,12 @@ Invoke-WebRequest -Method Get -Uri $crtUri -OutFile .\VcLibs.appx
 # Install the Foundry Local package
 Add-AppxPackage .\FoundryLocal.msix -DependencyPath .\VcLibs.appx
 ```
+
+## More resources
+
+- [Microsoft.Extensions.AI](https://learn.microsoft.com/dotnet/ai/microsoft-extensions-ai)
+- [Anthropic SDK](https://github.com/tghamm/Anthropic.SDK)
+- [Google Vertex AI SDK](https://github.com/mscraftsman/generative-ai)
+- [Azure AI Foundry](https://learn.microsoft.com/azure/ai-foundry/what-is-azure-ai-foundry)
+- [Foundry Local](https://learn.microsoft.com/azure/ai-foundry/foundry-local/what-is-foundry-local)
+- [MCP SDK](https://github.com/modelcontextprotocol/csharp-sdk)
