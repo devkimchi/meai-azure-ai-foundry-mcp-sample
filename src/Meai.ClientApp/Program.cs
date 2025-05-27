@@ -6,9 +6,6 @@ using Meai.ClientApp.Components;
 
 using Microsoft.Extensions.AI;
 
-using ModelContextProtocol.Client;
-using ModelContextProtocol.Protocol;
-
 using OpenAI;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -37,38 +34,7 @@ var openAIClient = endpoint.TrimEnd('/').Equals("https://models.inference.ai.azu
 var chatClient = openAIClient.GetChatClient(config["OpenAI:DeploymentName"]!).AsIChatClient();
 
 builder.Services.AddChatClient(chatClient)
-                .UseFunctionInvocation()
                 .UseLogging();
-
-builder.Services.AddSingleton<IMcpClient>(sp =>
-{
-    var config = sp.GetRequiredService<IConfiguration>();
-    var loggerFactory = sp.GetRequiredService<ILoggerFactory>();
-
-    // With .NET Aspire
-    // var uri = new Uri("https+http://mcpserver").Resolve(config);
-
-    // Without .NET Aspire
-    var uri = new Uri(config["McpServers:TodoList:Url"]!);
-
-    var clientTransportOptions = new SseClientTransportOptions()
-    {
-        Endpoint = new Uri($"{uri.AbsoluteUri.TrimEnd('/')}/sse"),
-        AdditionalHeaders = new() { { "x-api-key", config["McpServers:TodoList:ApiKey"]! } }
-    };
-    var clientTransport = new SseClientTransport(clientTransportOptions, loggerFactory);
-
-    var clientOptions = new McpClientOptions()
-    {
-        ClientInfo = new Implementation()
-        {
-            Name = "MCP Todo Client",
-            Version = "1.0.0",
-        }
-    };
-
-    return McpClientFactory.CreateAsync(clientTransport, clientOptions, loggerFactory).GetAwaiter().GetResult();
-});
 
 var app = builder.Build();
 

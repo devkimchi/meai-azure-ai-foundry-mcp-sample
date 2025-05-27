@@ -1,20 +1,16 @@
 ﻿@page "/"
 
-@using System.ComponentModel
-@using ModelContextProtocol.Client
-
 @inject IChatClient ChatClient
-@inject IMcpClient McpClient
 
 @implements IDisposable
 
-<PageTitle>MCP To-do List</PageTitle>
+<PageTitle>MEAI ChatClient</PageTitle>
 
 <ChatHeader OnNewChat="@ResetConversationAsync" />
 
 <ChatMessageList Messages="@messages" InProgressMessage="@currentResponseMessage">
     <NoMessagesContent>
-        <div>To get started, try setting a to-do list item or getting the list of to-to list items.</div>
+        <div>To get started, try asking a question or providing a prompt.</div>
     </NoMessagesContent>
 </ChatMessageList>
 
@@ -25,15 +21,13 @@
 
 @code {
     private const string SystemPrompt = @"
-        You are an assistant who manages to-do list items.
+        You are a friendly AI assistant.
         If the question is not clear, ask for clarification.
-        If the question is irrelevant to the to-do list one, respond like 'I only answer the to-do list related questions'.
+        If the question is inappropriate, respond like 'Sorry, the question is inappropriate.'.
         Use only simple markdown to format your responses.
-        Answer in English.
         ";
 
     private readonly ChatOptions chatOptions = new();
-    private IEnumerable<McpClientTool> tools = null!;
     private readonly List<ChatMessage> messages = new();
     private CancellationTokenSource? currentResponseCancellation;
     private ChatMessage? currentResponseMessage;
@@ -43,8 +37,8 @@
     protected override async Task OnInitializedAsync()
     {
         messages.Add(new(ChatRole.System, SystemPrompt));
-        tools = await McpClient.ListToolsAsync();
-        chatOptions.Tools = [.. tools];
+
+        await Task.CompletedTask;
     }
 
     private async Task AddUserMessageAsync(ChatMessage userMessage)
