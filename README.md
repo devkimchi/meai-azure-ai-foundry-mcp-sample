@@ -212,12 +212,12 @@ On Windows, if you keep failing to install Foundry Local CLI on your machine, tr
 ```powershell
 # Download the package and its dependency
 $releaseUri = "https://github.com/microsoft/Foundry-Local/releases/download/v0.3.9267/FoundryLocal-x64-0.3.9267.43123.msix"
-Invoke-WebRequest -Method Get -Uri $releaseUri -OutFile .\FoundryLocal.msix
+Invoke-WebRequest -Method Get -Uri $releaseUri -OutFile ./FoundryLocal.msix
 $crtUri = "https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx"
-Invoke-WebRequest -Method Get -Uri $crtUri -OutFile .\VcLibs.appx
+Invoke-WebRequest -Method Get -Uri $crtUri -OutFile ./VcLibs.appx
 
 # Install the Foundry Local package
-Add-AppxPackage .\FoundryLocal.msix -DependencyPath .\VcLibs.appx
+Add-AppxPackage ./FoundryLocal.msix -DependencyPath ./VcLibs.appx
 ```
 
 ## More resources
