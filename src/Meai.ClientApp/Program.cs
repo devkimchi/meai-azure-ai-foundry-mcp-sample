@@ -1,37 +1,26 @@
-using System.ClientModel;
-
 using Azure.AI.OpenAI;
 
 using Meai.ClientApp.Components;
+using Meai.ClientApp.Extensions;
 
 using Microsoft.Extensions.AI;
-
-using OpenAI;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var config = builder.Configuration;
-var connectionstring = config.GetConnectionString("openai") ?? throw new InvalidOperationException("Missing connection string: openai.");
-var endpoint = connectionstring.Split(';').FirstOrDefault(x => x.StartsWith("Endpoint=", StringComparison.InvariantCultureIgnoreCase))?.Split('=')[1]
-                   ?? throw new InvalidOperationException("Missing endpoint.");
-var apiKey = connectionstring.Split(';').FirstOrDefault(x => x.StartsWith("Key=", StringComparison.InvariantCultureIgnoreCase))?.Split('=')[1]
-                 ?? throw new InvalidOperationException("Missing API key.");
 
 builder.AddServiceDefaults();
 
 builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
 
-var credential = new ApiKeyCredential(apiKey);
-var openAIOptions = new OpenAIClientOptions()
+var chatClient = config["MEAI:ChatClient"]! switch
 {
-    Endpoint = new Uri(endpoint),
+    "openai" => builder.GetAzureOpenAIChatClient(),
+    "anthropic" => builder.GetAnthropicChatClient(),
+    "google" => builder.GetGoogleChatClient(),
+    _ => throw new InvalidOperationException("Unknown chat client.")
 };
-
-var openAIClient = endpoint.TrimEnd('/').Equals("https://models.inference.ai.azure.com")
-                   ? new OpenAIClient(credential, openAIOptions)
-                   : new AzureOpenAIClient(new Uri(endpoint), credential);
-var chatClient = openAIClient.GetChatClient(config["OpenAI:DeploymentName"]!).AsIChatClient();
 
 builder.Services.AddChatClient(chatClient)
                 .UseLogging();

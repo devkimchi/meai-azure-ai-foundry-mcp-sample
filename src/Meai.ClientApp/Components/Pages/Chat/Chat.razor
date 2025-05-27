@@ -1,6 +1,8 @@
 ﻿@page "/"
 
+@inject IConfiguration Config
 @inject IChatClient ChatClient
+@inject ILogger<Chat> Logger
 
 @implements IDisposable
 
@@ -27,7 +29,7 @@
         Use only simple markdown to format your responses.
         ";
 
-    private readonly ChatOptions chatOptions = new();
+    private readonly ChatOptions chatOptions = new() { MaxOutputTokens = 1000, Temperature = 0.7f, TopP = 0.9f };
     private readonly List<ChatMessage> messages = new();
     private CancellationTokenSource? currentResponseCancellation;
     private ChatMessage? currentResponseMessage;
@@ -36,6 +38,14 @@
 
     protected override async Task OnInitializedAsync()
     {
+        chatOptions.ModelId = Config["MEAI:ChatClient"]! switch
+        {
+            "openai" => Config["OpenAI:DeploymentName"]!,
+            "anthropic" => Config["Anthropic:ModelId"]!,
+            "google" => Config["Google:ModelName"]!,
+            _ => throw new InvalidOperationException("Unsupported chat model specified in configuration.")
+        };
+
         messages.Add(new(ChatRole.System, SystemPrompt));
 
         await Task.CompletedTask;
@@ -49,6 +59,8 @@
         messages.Add(userMessage);
         chatSuggestions?.Clear();
         await chatInput!.FocusAsync();
+
+        Logger.LogInformation("Using chat model: {modelId}", chatOptions.ModelId);
 
         // Stream and display a new response from the IChatClient
         var responseText = new TextContent("");

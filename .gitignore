@@ -486,3 +486,5 @@ $RECYCLE.BIN/
 # src/McpTodo.ServerApp/
 *.db
 .azure
+
+nuget.config
